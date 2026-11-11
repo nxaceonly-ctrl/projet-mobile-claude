@@ -1,81 +1,110 @@
-import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { rankFor, STAT_LABELS, StatKey, xpForLevel } from '../data';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { rankFor, STAT_ICONS, STAT_LABELS, StatKey, xpForLevel } from '../data';
 import { useGame } from '../store';
-import { colors } from '../theme';
-import { ProgressBar, SysButton, SystemWindow, Txt } from '../components/ui';
+import { colors, fonts, gradients } from '../theme';
+import { Card, IconBadge, IconName, ProgressBar, RoundButton, Tile, Txt } from '../components/ui';
 
 export default function StatusScreen() {
-  const { state, spendPoint, setName, resetAll } = useGame();
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(state.name);
+  const { state, spendPoint } = useGame();
   const need = xpForLevel(state.level);
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <SystemWindow title="STATUT">
-        {editing ? (
-          <View style={styles.row}>
-            <TextInput value={draft} onChangeText={setDraft} style={styles.input} maxLength={20} autoFocus />
-            <SysButton small label="OK" onPress={() => { setName(draft); setEditing(false); }} />
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <Card title="STATUT">
+        <View style={{ alignItems: 'center' }}>
+          <LinearGradient colors={gradients.primary} style={styles.avatarRing}>
+            <View style={styles.avatar}>
+              <Txt style={styles.level}>{state.level}</Txt>
+              <Txt dim size={11} weight="semibold" style={{ letterSpacing: 2 }}>NIVEAU</Txt>
+            </View>
+          </LinearGradient>
+          <Txt weight="bold" size={22} style={{ marginTop: 12 }}>{state.name}</Txt>
+          <View style={styles.rankChip}>
+            <Ionicons name="medal" size={14} color={colors.gold} />
+            <Txt weight="semibold" size={13} color={colors.gold}>{rankFor(state.level)}</Txt>
           </View>
-        ) : (
-          <Txt style={styles.name}>{state.name}</Txt>
-        )}
-        {!editing && <SysButton small label="Changer de nom" onPress={() => { setDraft(state.name); setEditing(true); }} />}
-
-        <View style={styles.levelBox}>
-          <Txt dim>NIVEAU</Txt>
-          <Txt style={styles.level}>{state.level}</Txt>
-          <Txt style={{ color: colors.gold, letterSpacing: 2 }}>Titre : {rankFor(state.level)}</Txt>
         </View>
-        <Txt dim>
-          XP {state.xp} / {need}
-        </Txt>
-        <ProgressBar value={state.xp} max={need} />
-        <View style={[styles.row, { marginTop: 12, justifyContent: 'space-between' }]}>
-          <Txt dim>Série actuelle : {state.streak} 🔥</Txt>
-          <Txt dim>Record : {state.bestStreak}</Txt>
-        </View>
-        <Txt dim>Portails conquis : {state.clearedPortals.length}</Txt>
-      </SystemWindow>
 
-      <SystemWindow title="CARACTÉRISTIQUES">
+        <View style={{ marginTop: 18 }}>
+          <View style={styles.between}>
+            <Txt dim size={12}>Expérience</Txt>
+            <Txt size={12} weight="semibold">{state.xp} / {need} XP</Txt>
+          </View>
+          <ProgressBar value={state.xp} max={need} />
+        </View>
+
+        <View style={styles.statsRow}>
+          {[
+            { label: 'Série', value: state.streak, icon: 'flame' },
+            { label: 'Record', value: state.bestStreak, icon: 'trophy' },
+            { label: 'Portails', value: state.clearedPortals.length, icon: 'planet' },
+          ].map((s) => (
+            <Tile key={s.label} style={styles.miniTile}>
+              <Ionicons name={s.icon as IconName} size={18} color={colors.glow} />
+              <Txt weight="extrabold" size={20}>{s.value}</Txt>
+              <Txt dim size={11}>{s.label}</Txt>
+            </Tile>
+          ))}
+        </View>
+      </Card>
+
+      <Card title="CARACTÉRISTIQUES">
         {state.statPoints > 0 && (
-          <Txt style={{ color: colors.gold, marginBottom: 8 }}>Points disponibles : {state.statPoints}</Txt>
+          <View style={styles.pointsBanner}>
+            <Ionicons name="sparkles" size={16} color={colors.gold} />
+            <Txt weight="semibold" color={colors.gold}>{state.statPoints} point(s) à répartir</Txt>
+          </View>
         )}
         {(Object.keys(STAT_LABELS) as StatKey[]).map((k) => (
-          <View key={k} style={styles.statRow}>
-            <Txt style={styles.statKey}>{k}</Txt>
-            <Txt style={{ flex: 1 }}>{STAT_LABELS[k]}</Txt>
-            <Txt style={styles.statVal}>{state.stats[k]}</Txt>
-            <SysButton small label="+" disabled={state.statPoints <= 0} onPress={() => spendPoint(k)} />
-          </View>
+          <Tile key={k} style={styles.statRow}>
+            <IconBadge name={STAT_ICONS[k] as IconName} />
+            <View style={{ flex: 1 }}>
+              <Txt weight="semibold" size={15}>{STAT_LABELS[k]}</Txt>
+              <Txt dim size={11} style={{ letterSpacing: 1.5 }}>{k}</Txt>
+            </View>
+            <Txt weight="extrabold" size={22} style={{ marginRight: 8 }}>{state.stats[k]}</Txt>
+            {state.statPoints > 0 && <RoundButton icon="add" size={34} onPress={() => spendPoint(k)} />}
+          </Tile>
         ))}
-      </SystemWindow>
-
-      <SysButton
-        tone="danger"
-        label="RÉINITIALISER LA PARTIE"
-        onPress={() =>
-          Alert.alert('Tout effacer ?', 'Ta progression sera perdue.', [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Effacer', style: 'destructive', onPress: resetAll },
-          ])
-        }
-      />
+      </Card>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 16, paddingBottom: 40 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { fontSize: 20, fontWeight: '700', marginBottom: 6 },
-  input: { flex: 1, borderWidth: 1, borderColor: colors.border, color: colors.text, padding: 8, borderRadius: 4 },
-  levelBox: { alignItems: 'center', marginVertical: 14 },
-  level: { fontSize: 56, fontWeight: '800', color: colors.glow, fontFamily: 'monospace' },
-  statRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, gap: 10, borderBottomWidth: 1, borderBottomColor: '#16213A' },
-  statKey: { fontFamily: 'monospace', fontWeight: '700', color: colors.glow, width: 40 },
-  statVal: { fontFamily: 'monospace', fontSize: 18, fontWeight: '700', width: 40, textAlign: 'right' },
+  content: { padding: 18, paddingBottom: 120 },
+  avatarRing: { width: 124, height: 124, borderRadius: 62, padding: 3 },
+  avatar: { flex: 1, borderRadius: 60, backgroundColor: colors.bgMid, alignItems: 'center', justifyContent: 'center' },
+  level: { fontFamily: fonts.extrabold, fontSize: 44, color: colors.text, lineHeight: 50 },
+  rankChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(232,180,76,0.45)',
+    backgroundColor: 'rgba(232,180,76,0.1)',
+  },
+  between: { flexDirection: 'row', justifyContent: 'space-between' },
+  statsRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  miniTile: { flex: 1, alignItems: 'center', gap: 2, marginBottom: 0 },
+  statRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  pointsBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 12,
+    backgroundColor: colors.goldBg,
+    borderWidth: 1,
+    borderColor: 'rgba(232,180,76,0.4)',
+  },
 });

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { DAILY_QUESTS, PENALTY_QUEST, STAT_LABELS } from '../data';
 import { useGame } from '../store';
-import { colors } from '../theme';
-import { ProgressBar, SysButton, SystemWindow, Txt } from '../components/ui';
+import { colors, fonts } from '../theme';
+import { Card, IconBadge, IconName, ProgressBar, RoundButton, Tile, Txt } from '../components/ui';
 
 // Temps restant avant minuit (fin des 24h).
 function useCountdown() {
@@ -15,10 +15,8 @@ function useCountdown() {
   const end = new Date(now);
   end.setHours(24, 0, 0, 0);
   const ms = end.getTime() - now;
-  const h = Math.floor(ms / 3_600_000);
-  const m = Math.floor((ms % 3_600_000) / 60_000);
-  const s = Math.floor((ms % 60_000) / 1000);
-  return { text: [h, m, s].map((n) => String(n).padStart(2, '0')).join(':'), urgent: ms < 3 * 3_600_000 };
+  const parts = [Math.floor(ms / 3_600_000), Math.floor((ms % 3_600_000) / 60_000), Math.floor((ms % 60_000) / 1000)];
+  return { text: parts.map((n) => String(n).padStart(2, '0')).join(':'), urgent: ms < 3 * 3_600_000 };
 }
 
 const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1));
@@ -27,71 +25,95 @@ export default function QuestsScreen() {
   const { state, addProgress, addPenaltyProgress } = useGame();
   const countdown = useCountdown();
   const doneCount = DAILY_QUESTS.filter((q) => (state.progress[q.id] ?? 0) >= q.target).length;
+  const locked = state.penalty.active;
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      {state.penalty.active && (
-        <SystemWindow title="⚠ ZONE DE PÉNALITÉ" tone="danger">
-          <Txt>Tu as manqué tes quêtes d'hier. Termine cette épreuve pour débloquer celles d'aujourd'hui.</Txt>
-          <View style={styles.questRow}>
+    <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      {locked && (
+        <Card title="PÉNALITÉ" tone="danger">
+          <Txt dim style={{ textAlign: 'center', marginBottom: 14 }}>
+            Tu as manqué tes quêtes d'hier. Termine cette épreuve pour débloquer celles d'aujourd'hui.
+          </Txt>
+          <Tile style={styles.row}>
+            <IconBadge name="skull" tone="danger" />
             <View style={{ flex: 1 }}>
-              <Txt style={styles.questTitle}>{PENALTY_QUEST.title}</Txt>
-              <Txt dim>
+              <Txt weight="semibold" size={15}>{PENALTY_QUEST.title}</Txt>
+              <Txt dim size={12}>
                 {state.penalty.progress} / {PENALTY_QUEST.target} {PENALTY_QUEST.unit}
               </Txt>
-              <ProgressBar value={state.penalty.progress} max={PENALTY_QUEST.target} color={colors.danger} />
+              <ProgressBar value={state.penalty.progress} max={PENALTY_QUEST.target} tone="danger" />
             </View>
-            <SysButton small tone="danger" label={`+${PENALTY_QUEST.step}`} onPress={() => addPenaltyProgress(PENALTY_QUEST.step)} />
-          </View>
-        </SystemWindow>
+            <RoundButton icon="add" size={38} onPress={() => addPenaltyProgress(PENALTY_QUEST.step)} />
+          </Tile>
+        </Card>
       )}
 
-      <SystemWindow title="QUÊTES DU JOUR">
-        <View style={styles.header}>
-          <Txt dim>Temps restant</Txt>
-          <Txt style={[styles.timer, countdown.urgent && { color: colors.danger }]}>{countdown.text}</Txt>
-          <Txt dim>
-            {doneCount}/{DAILY_QUESTS.length} terminées · Série {state.streak} 🔥
+      <Card title="QUÊTES DU JOUR">
+        <View style={styles.timerBox}>
+          <Txt dim size={12} style={{ letterSpacing: 1 }}>TEMPS RESTANT</Txt>
+          <Txt style={[styles.timer, countdown.urgent && { color: colors.danger, textShadowColor: colors.danger }]}>
+            {countdown.text}
           </Txt>
+          <View style={styles.chips}>
+            <View style={styles.chip}>
+              <Txt size={12} weight="semibold">✓ {doneCount}/{DAILY_QUESTS.length}</Txt>
+            </View>
+            <View style={styles.chip}>
+              <Txt size={12} weight="semibold">🔥 Série {state.streak}</Txt>
+            </View>
+          </View>
         </View>
 
         {DAILY_QUESTS.map((q) => {
           const p = state.progress[q.id] ?? 0;
           const done = p >= q.target;
           return (
-            <View key={q.id} style={[styles.questRow, state.penalty.active && { opacity: 0.35 }]}>
+            <Tile key={q.id} style={[styles.row, locked && { opacity: 0.35 }, done && styles.tileDone]}>
+              <IconBadge name={(done ? 'checkmark' : q.icon) as IconName} tone={done ? 'success' : 'info'} />
               <View style={{ flex: 1 }}>
-                <Txt style={[styles.questTitle, done && { color: colors.success }]}>
-                  {done ? '✓ ' : ''}
-                  {q.title}
-                </Txt>
-                <Txt dim>
+                <Txt weight="semibold" size={15} color={done ? colors.success : colors.text}>{q.title}</Txt>
+                <Txt dim size={12}>
                   {fmt(p)} / {fmt(q.target)} {q.unit} · +{q.xp} XP · {STAT_LABELS[q.stat]}
                 </Txt>
-                <ProgressBar value={p} max={q.target} color={done ? colors.success : colors.glow} />
+                <ProgressBar value={p} max={q.target} tone={done ? 'success' : 'info'} />
               </View>
-              <View style={styles.btns}>
-                <SysButton small label="−" disabled={state.penalty.active || p <= 0} onPress={() => addProgress(q.id, -q.step)} />
-                <SysButton small label="+" disabled={state.penalty.active || done} onPress={() => addProgress(q.id, q.step)} />
+              <View style={{ gap: 6 }}>
+                <RoundButton icon="add" size={34} disabled={locked || done} onPress={() => addProgress(q.id, q.step)} />
+                <RoundButton icon="remove" size={34} disabled={locked || p <= 0} onPress={() => addProgress(q.id, -q.step)} />
               </View>
-            </View>
+            </Tile>
           );
         })}
 
-        <Txt dim style={styles.warn}>
-          Si toutes les quêtes ne sont pas terminées avant minuit, une pénalité s'applique.
+        <Txt dim size={12} style={{ marginTop: 6, textAlign: 'center' }}>
+          Tout doit être terminé avant minuit, sinon une pénalité s'applique.
         </Txt>
-      </SystemWindow>
+      </Card>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 16, paddingBottom: 40 },
-  header: { alignItems: 'center', marginBottom: 8 },
-  timer: { fontFamily: 'monospace', fontSize: 34, fontWeight: '700', color: colors.glow, marginVertical: 4 },
-  questRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#16213A', gap: 10 },
-  questTitle: { fontSize: 16, fontWeight: '600' },
-  btns: { flexDirection: 'row', gap: 6 },
-  warn: { marginTop: 10, fontSize: 12, textAlign: 'center' },
+  content: { padding: 18, paddingBottom: 120 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  tileDone: { borderColor: 'rgba(61,220,151,0.3)' },
+  timerBox: { alignItems: 'center', marginBottom: 16 },
+  timer: {
+    fontFamily: fonts.extrabold,
+    fontSize: 44,
+    color: colors.glow,
+    letterSpacing: 2,
+    textShadowColor: colors.primary,
+    textShadowRadius: 16,
+    marginVertical: 2,
+  },
+  chips: { flexDirection: 'row', gap: 8, marginTop: 6 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
 });

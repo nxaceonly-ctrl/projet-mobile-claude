@@ -18,16 +18,25 @@ export type QuestTemplate = {
   step: number; // incrément du bouton +
   xp: number;
   stat: StatKey;
+  icon: string; // nom d'icône Ionicons
+};
+
+export const STAT_ICONS: Record<StatKey, string> = {
+  FOR: 'barbell',
+  END: 'pulse',
+  AGI: 'flash',
+  MEN: 'sparkles',
+  VIT: 'heart',
 };
 
 // Quêtes du jour : corps + esprit + santé.
 export const DAILY_QUESTS: QuestTemplate[] = [
-  { id: 'pushups', title: 'Pompes', target: 30, unit: 'reps', step: 5, xp: 20, stat: 'FOR' },
-  { id: 'squats', title: 'Squats', target: 40, unit: 'reps', step: 10, xp: 20, stat: 'FOR' },
-  { id: 'cardio', title: 'Marche ou course', target: 3, unit: 'km', step: 0.5, xp: 25, stat: 'END' },
-  { id: 'stretch', title: 'Étirements', target: 10, unit: 'min', step: 5, xp: 15, stat: 'AGI' },
-  { id: 'meditate', title: 'Méditation / respiration', target: 10, unit: 'min', step: 5, xp: 20, stat: 'MEN' },
-  { id: 'water', title: "Boire de l'eau", target: 2, unit: 'L', step: 0.5, xp: 10, stat: 'VIT' },
+  { id: 'pushups', title: 'Pompes', target: 30, unit: 'reps', step: 5, xp: 20, stat: 'FOR', icon: 'barbell' },
+  { id: 'squats', title: 'Squats', target: 40, unit: 'reps', step: 10, xp: 20, stat: 'FOR', icon: 'body' },
+  { id: 'cardio', title: 'Marche ou course', target: 3, unit: 'km', step: 0.5, xp: 25, stat: 'END', icon: 'walk' },
+  { id: 'stretch', title: 'Étirements', target: 10, unit: 'min', step: 5, xp: 15, stat: 'AGI', icon: 'accessibility' },
+  { id: 'meditate', title: 'Méditation / respiration', target: 10, unit: 'min', step: 5, xp: 20, stat: 'MEN', icon: 'leaf' },
+  { id: 'water', title: "Boire de l'eau", target: 2, unit: 'L', step: 0.5, xp: 10, stat: 'VIT', icon: 'water' },
 ];
 
 // Quête imposée quand les quêtes du jour n'ont pas été terminées à temps.
@@ -39,6 +48,7 @@ export const PENALTY_QUEST: QuestTemplate = {
   step: 5,
   xp: 0,
   stat: 'END',
+  icon: 'skull',
 };
 export const PENALTY_XP_LOSS = 50;
 
