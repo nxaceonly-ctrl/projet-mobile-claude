@@ -182,7 +182,7 @@ export default function IntroScreen({ onDone }: { onDone: () => void }) {
             )}
           </Animated.View>
 
-          <Txt dim size={11} style={styles.skip}>Touchez pour passer</Txt>
+          <Txt dim size={11} style={styles.skip}>Touche l’écran pour passer</Txt>
 
           {/* flash final */}
           <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: '#BFDBFF', opacity: flash }]} />

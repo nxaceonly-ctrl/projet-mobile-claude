@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Pressable, StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { Alert, Platform, Pressable, StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { colors, fonts, gradients, radius } from '../theme';
 
 export type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -260,3 +260,15 @@ const styles = StyleSheet.create({
   segItem: { borderRadius: 12, paddingVertical: 11 },
   segInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
 });
+
+// Demande de confirmation qui marche aussi dans la version web (Alert n'y affiche rien).
+export function confirmAction(title: string, message: string, okLabel: string, onOk: () => void) {
+  if (Platform.OS === 'web') {
+    if (window.confirm(`${title}\n\n${message}`)) onOk();
+    return;
+  }
+  Alert.alert(title, message, [
+    { text: 'Annuler', style: 'cancel' },
+    { text: okLabel, style: 'destructive', onPress: onOk },
+  ]);
+}

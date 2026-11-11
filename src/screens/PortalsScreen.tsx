@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { PORTALS, STAT_LABELS } from '../data';
 import { useGame } from '../store';
 import { colors } from '../theme';
-import { Button, Card, Segmented, Tile, Txt } from '../components/ui';
+import { Button, Card, confirmAction, Segmented, Tile, Txt } from '../components/ui';
 
 const TIER_COLORS: Record<string, string> = {
   E: '#8C97B2',
@@ -47,10 +47,7 @@ export default function PortalsScreen() {
               label="Abandonner"
               variant="danger"
               onPress={() =>
-                Alert.alert('Abandonner le portail ?', 'Tu perdras de l’XP.', [
-                  { text: 'Annuler', style: 'cancel' },
-                  { text: 'Abandonner', style: 'destructive', onPress: abandonPortal },
-                ])
+                confirmAction('Abandonner le portail ?', 'Tu perdras de l’XP.', 'Abandonner', abandonPortal)
               }
             />
           </View>

@@ -10,10 +10,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Card, IconName, RoundButton, Txt } from './src/components/ui';
-import { DAILY_QUESTS } from './src/data';
+import { Button, Card, confirmAction, IconName, RoundButton, Txt } from './src/components/ui';
+import { DAILY_QUESTS, plural } from './src/data';
 import IntroScreen from './src/screens/IntroScreen';
 import PortalsScreen from './src/screens/PortalsScreen';
 import QuestsScreen from './src/screens/QuestsScreen';
@@ -64,7 +64,7 @@ function ReminderModal({ visible, onClose }: { visible: boolean; onClose: () => 
             <Txt style={{ textAlign: 'center' }}>Toutes les quêtes du jour sont terminées. Bien joué !</Txt>
           ) : (
             <>
-              <Txt dim style={{ marginBottom: 8 }}>Il te reste {left.length} quête(s) avant minuit :</Txt>
+              <Txt dim style={{ marginBottom: 8 }}>Il te reste {plural(left.length, 'quête')} avant minuit :</Txt>
               {left.map((q) => (
                 <Txt key={q.id} style={{ marginVertical: 2 }}>• {q.title}</Txt>
               ))}
@@ -93,10 +93,10 @@ function MenuModal({ visible, onClose }: { visible: boolean; onClose: () => void
               variant="danger"
               icon="trash"
               onPress={() =>
-                Alert.alert('Tout effacer ?', 'Ta progression sera perdue.', [
-                  { text: 'Annuler', style: 'cancel' },
-                  { text: 'Effacer', style: 'destructive', onPress: () => { resetAll(); onClose(); } },
-                ])
+                confirmAction('Tout effacer ?', 'Ta progression sera perdue.', 'Effacer', () => {
+                  resetAll();
+                  onClose();
+                })
               }
             />
             <Button label="Fermer" variant="secondary" onPress={onClose} />

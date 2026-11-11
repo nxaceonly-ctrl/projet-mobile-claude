@@ -4,7 +4,9 @@ import {
   DAILY_QUESTS,
   PENALTY_QUEST,
   PENALTY_XP_LOSS,
+  plural,
   PORTALS,
+  STAT_LABELS,
   StatKey,
   xpForLevel,
 } from './data';
@@ -67,7 +69,7 @@ function gainXp(s: GameState, amount: number, notices: Notice[]): GameState {
   if (ups > 0) {
     notices.push({
       title: 'NIVEAU SUPÉRIEUR',
-      lines: [`Tu passes au niveau ${level} !`, `+${ups * POINTS_PER_LEVEL} points de stats à répartir.`],
+      lines: [`Tu passes au niveau ${level} !`, `+${ups * POINTS_PER_LEVEL} points de caractéristiques à répartir.`],
       tone: 'success',
     });
   }
@@ -89,7 +91,7 @@ function tick(s: GameState, notices: Notice[]): GameState {
       notices.push({
         title: 'PÉNALITÉ',
         lines: [
-          "Les quêtes du jour n'ont pas été terminées.",
+          'Les quêtes du jour n’ont pas été terminées.',
           `-${PENALTY_XP_LOSS} XP. Série remise à zéro.`,
           `Termine "${PENALTY_QUEST.title}" pour débloquer les quêtes.`,
         ],
@@ -179,7 +181,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         next = { ...next, dailyCleared: true, streak, bestStreak: Math.max(streak, next.bestStreak) };
         notices.push({
           title: 'QUÊTES DU JOUR TERMINÉES',
-          lines: [`Bonus : +${DAILY_BONUS_XP} XP`, `Série : ${streak} jour(s)`],
+          lines: [`Bonus : +${DAILY_BONUS_XP} XP`, `Série : ${plural(streak, 'jour')}`],
           tone: 'success',
         });
         next = gainXp(next, DAILY_BONUS_XP, notices);
@@ -209,7 +211,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       if (s.activePortal || s.level < portal.minLevel) return s;
       notices.push({
         title: 'PORTAIL OUVERT',
-        lines: [portal.name, `Tu as ${portal.durationDays} jour(s) pour le terminer.`],
+        lines: [portal.name, `Tu as ${plural(portal.durationDays, 'jour')} pour le terminer.`],
         tone: 'info',
       });
       return { ...s, activePortal: { id, endsAt: Date.now() + portal.durationDays * 86_400_000 } };
@@ -227,7 +229,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       };
       notices.push({
         title: 'PORTAIL CONQUIS',
-        lines: [portal.name, `+${portal.xp} XP`, `+${portal.statGain} ${portal.stat}`],
+        lines: [portal.name, `+${portal.xp} XP`, `+${portal.statGain} ${STAT_LABELS[portal.stat]}`],
         tone: 'success',
       });
       next = gainXp(next, portal.xp, notices);

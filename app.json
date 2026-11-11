@@ -32,6 +32,14 @@
     },
     "updates": {
       "url": "https://u.expo.dev/317d99cf-d467-4a1d-9faf-eb1abf92d6e9"
+    },
+    "experiments": {
+      "baseUrl": "/projet-mobile-claude"
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#05070F"
     }
   }
 }

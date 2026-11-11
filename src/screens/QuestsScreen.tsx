@@ -32,7 +32,7 @@ export default function QuestsScreen() {
       {locked && (
         <Card title="PÉNALITÉ" tone="danger">
           <Txt dim style={{ textAlign: 'center', marginBottom: 14 }}>
-            Tu as manqué tes quêtes d'hier. Termine cette épreuve pour débloquer celles d'aujourd'hui.
+            Tu as manqué tes quêtes d’hier. Termine cette épreuve pour débloquer celles d’aujourd’hui.
           </Txt>
           <Tile style={styles.row}>
             <IconBadge name="skull" tone="danger" />
@@ -86,7 +86,7 @@ export default function QuestsScreen() {
         })}
 
         <Txt dim size={12} style={{ marginTop: 6, textAlign: 'center' }}>
-          Tout doit être terminé avant minuit, sinon une pénalité s'applique.
+          Tout doit être terminé avant minuit, sinon une pénalité s’applique.
         </Txt>
       </Card>
     </ScrollView>

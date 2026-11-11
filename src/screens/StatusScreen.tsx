@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { rankFor, STAT_ICONS, STAT_LABELS, StatKey, xpForLevel } from '../data';
+import { plural, rankFor, STAT_ICONS, STAT_LABELS, StatKey, xpForLevel } from '../data';
 import { useGame } from '../store';
 import { colors, fonts, gradients } from '../theme';
 import { Card, IconBadge, IconName, ProgressBar, RoundButton, Tile, Txt } from '../components/ui';
@@ -55,7 +55,7 @@ export default function StatusScreen() {
         {state.statPoints > 0 && (
           <View style={styles.pointsBanner}>
             <Ionicons name="sparkles" size={16} color={colors.gold} />
-            <Txt weight="semibold" color={colors.gold}>{state.statPoints} point(s) à répartir</Txt>
+            <Txt weight="semibold" color={colors.gold}>{plural(state.statPoints, 'point')} à répartir</Txt>
           </View>
         )}
         {(Object.keys(STAT_LABELS) as StatKey[]).map((k) => (
