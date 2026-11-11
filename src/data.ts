@@ -52,10 +52,12 @@ export const PENALTY_QUEST: QuestTemplate = {
 };
 export const PENALTY_XP_LOSS = 50;
 
+export type PortalRank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S';
+
 export type Portal = {
   id: string;
   name: string;
-  tier: 'I' | 'II' | 'III' | 'IV' | 'V';
+  tier: PortalRank;
   description: string;
   durationDays: number;
   xp: number;
@@ -66,22 +68,25 @@ export type Portal = {
 
 // Les "portails" : défis plus longs avec une limite de temps.
 export const PORTALS: Portal[] = [
-  { id: 'p1', name: 'Portail de la Vigilance', tier: 'I', description: '3 jours de suite : coucher avant 23h et 7h de sommeil.', durationDays: 3, xp: 120, stat: 'VIT', statGain: 2, minLevel: 1 },
-  { id: 'p2', name: 'Portail du Centenaire', tier: 'I', description: '100 pompes en une seule journée.', durationDays: 1, xp: 100, stat: 'FOR', statGain: 2, minLevel: 1 },
-  { id: 'p3', name: 'Portail du Silence', tier: 'II', description: '5 jours sans réseaux sociaux avant midi.', durationDays: 5, xp: 200, stat: 'MEN', statGain: 3, minLevel: 3 },
-  { id: 'p4', name: 'Portail des Dix Mille', tier: 'II', description: '10 000 pas par jour pendant 5 jours.', durationDays: 5, xp: 220, stat: 'END', statGain: 3, minLevel: 3 },
-  { id: 'p5', name: 'Portail du Sucre Brisé', tier: 'III', description: '7 jours sans sucre ajouté ni soda.', durationDays: 7, xp: 350, stat: 'VIT', statGain: 4, minLevel: 5 },
-  { id: 'p6', name: 'Portail du Fer', tier: 'IV', description: '1 min de gainage + 50 squats sautés, 10 jours d’affilée.', durationDays: 10, xp: 500, stat: 'FOR', statGain: 5, minLevel: 8 },
-  { id: 'p7', name: 'Portail de l’Aube', tier: 'V', description: 'Lever à 6h, sport + 10 min de journal, 14 jours.', durationDays: 14, xp: 900, stat: 'MEN', statGain: 8, minLevel: 12 },
+  { id: 'p1', name: 'Portail de la Vigilance', tier: 'E', description: '3 jours de suite : coucher avant 23h et 7h de sommeil.', durationDays: 3, xp: 120, stat: 'VIT', statGain: 2, minLevel: 1 },
+  { id: 'p2', name: 'Portail du Centenaire', tier: 'E', description: '100 pompes en une seule journée.', durationDays: 1, xp: 100, stat: 'FOR', statGain: 2, minLevel: 1 },
+  { id: 'p3', name: 'Portail du Silence', tier: 'D', description: '5 jours sans réseaux sociaux avant midi.', durationDays: 5, xp: 200, stat: 'MEN', statGain: 3, minLevel: 3 },
+  { id: 'p4', name: 'Portail des Dix Mille', tier: 'D', description: '10 000 pas par jour pendant 5 jours.', durationDays: 5, xp: 220, stat: 'END', statGain: 3, minLevel: 3 },
+  { id: 'p5', name: 'Portail du Sucre Brisé', tier: 'C', description: '7 jours sans sucre ajouté ni soda.', durationDays: 7, xp: 350, stat: 'VIT', statGain: 4, minLevel: 5 },
+  { id: 'p6', name: 'Portail du Fer', tier: 'B', description: '1 min de gainage + 50 squats sautés, 10 jours d’affilée.', durationDays: 10, xp: 500, stat: 'FOR', statGain: 5, minLevel: 8 },
+  { id: 'p7', name: 'Portail de l’Aube', tier: 'A', description: 'Lever à 6h, sport + 10 min de journal, 14 jours.', durationDays: 14, xp: 900, stat: 'MEN', statGain: 8, minLevel: 12 },
+  { id: 'p8', name: 'Portail du Titan', tier: 'S', description: '30 jours sans manquer une seule quête journalière.', durationDays: 30, xp: 2000, stat: 'END', statGain: 15, minLevel: 20 },
 ];
 
-// Titres de rang, débloqués selon le niveau.
+// Rangs du joueur, du plus faible (E) au plus fort (S), puis l'ultime : rang Nation.
 export const RANKS = [
-  { minLevel: 1, name: 'Éveillé' },
-  { minLevel: 5, name: 'Initié' },
-  { minLevel: 10, name: 'Vétéran' },
-  { minLevel: 20, name: 'Élite' },
-  { minLevel: 35, name: 'Ascendant' },
+  { minLevel: 1, name: 'Rang E' },
+  { minLevel: 5, name: 'Rang D' },
+  { minLevel: 10, name: 'Rang C' },
+  { minLevel: 18, name: 'Rang B' },
+  { minLevel: 28, name: 'Rang A' },
+  { minLevel: 40, name: 'Rang S' },
+  { minLevel: 60, name: 'Rang Nation' },
 ];
 
 export const xpForLevel = (level: number) => 100 + (level - 1) * 50;

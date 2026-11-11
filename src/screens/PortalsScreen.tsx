@@ -7,11 +7,12 @@ import { colors } from '../theme';
 import { Button, Card, Segmented, Tile, Txt } from '../components/ui';
 
 const TIER_COLORS: Record<string, string> = {
-  I: '#6FB4FF',
-  II: '#3DDC97',
-  III: '#E8B44C',
-  IV: '#FF6B9A',
-  V: '#A98BFF',
+  E: '#8C97B2',
+  D: '#6FB4FF',
+  C: '#3DDC97',
+  B: '#E8B44C',
+  A: '#FF6B9A',
+  S: '#A98BFF',
 };
 
 function remaining(endsAt: number) {
