@@ -14,6 +14,7 @@ import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, TextInput, View
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Card, IconName, RoundButton, Txt } from './src/components/ui';
 import { DAILY_QUESTS } from './src/data';
+import IntroScreen from './src/screens/IntroScreen';
 import PortalsScreen from './src/screens/PortalsScreen';
 import QuestsScreen from './src/screens/QuestsScreen';
 import StatusScreen from './src/screens/StatusScreen';
@@ -28,10 +29,10 @@ const TABS: { key: TabKey; icon: IconName }[] = [
 type TabKey = 'quests' | 'portals' | 'status';
 
 // Fenêtre "système" par-dessus l'écran (niveau gagné, pénalité...).
-function NoticeModal() {
+function NoticeModal({ hidden }: { hidden?: boolean }) {
   const { notice, dismissNotice } = useGame();
   return (
-    <Modal visible={!!notice} transparent animationType="fade" onRequestClose={dismissNotice}>
+    <Modal visible={!!notice && !hidden} transparent animationType="fade" onRequestClose={dismissNotice}>
       <View style={styles.backdrop}>
         {notice && (
           <Card title={notice.title} tone={notice.tone} style={styles.modalCard}>
@@ -111,6 +112,7 @@ function Main() {
   const [tab, setTab] = useState<TabKey>('quests');
   const [menu, setMenu] = useState(false);
   const [reminder, setReminder] = useState(false);
+  const [intro, setIntro] = useState(true);
 
   return (
     <LinearGradient colors={gradients.bg} style={{ flex: 1 }}>
@@ -147,9 +149,10 @@ function Main() {
         </View>
       </SafeAreaView>
 
-      <NoticeModal />
+      <NoticeModal hidden={intro} />
       <ReminderModal visible={reminder} onClose={() => setReminder(false)} />
       <MenuModal visible={menu} onClose={() => setMenu(false)} />
+      {ready && intro && <IntroScreen onDone={() => setIntro(false)} />}
     </LinearGradient>
   );
 }
