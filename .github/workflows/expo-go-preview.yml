@@ -26,9 +26,7 @@ jobs:
 
       - run: npm ci
 
-      # Crée (ou retrouve) le projet "ascendant" sur ton compte Expo.
-      - run: eas init --non-interactive --force
-
-      - run: eas update:configure --platform all --non-interactive
-
-      - run: eas update --branch preview --message "${{ github.event.head_commit.message || 'Mise à jour manuelle' }}" --non-interactive
+      # Le projet Expo est déjà lié via extra.eas.projectId dans app.json.
+      - run: eas update --branch preview --message "$MSG" --non-interactive
+        env:
+          MSG: ${{ github.event.head_commit.message || 'Mise à jour manuelle' }}
